@@ -139,6 +139,13 @@ The fourth example (http://localhost:8090/?fourth) shows how to use async functi
   appRender() 
 ```
 
+
+Note that virtual elements in the following expression are created asynchronously.
+
+```
+await (<Row><Counter/><IncreaseButton/></Row>)
+```
+
 The last simple example (http://localhost:8090/?fifth)  shows how to use React elements in virtual elements:
 
 ```
