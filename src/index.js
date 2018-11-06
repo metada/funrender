@@ -2,13 +2,14 @@ import {render} from './funrender.js'
 import {element, row, column} from './element.js'
 
 const param = window.location.href.split('?')[1]
-const domElement = document.getElementById('content')
+
 
 const firstExample = () => {
-  render(domElement, element('div', {}, ['Hello world']))
+  render(document.getElementById('content'), element('div', {}, 'Hello world'))
 }
 
 const secondExample = () => {
+  const domElement = document.getElementById('content')
   let value = ""
   let lastVirtualElement
 
@@ -30,6 +31,7 @@ const secondExample = () => {
 }
 
 const thirdExample = () => {
+  const domElement = document.getElementById('content')
   let state = {
     todos: [],
     inputValue: ''
@@ -73,7 +75,7 @@ const thirdExample = () => {
 }
 
 const fourthExample = () => {
-    
+  const domElement = document.getElementById('content')
   const sleep = time => {
     return new Promise(resolve => {
       setTimeout(() => {
@@ -111,6 +113,7 @@ const fourthExample = () => {
   const viewIncreaseButton = () => {
     return element('button', {onClick: handleAdd}, 'increase')
   }
+  
   let lastVirtualElement
   let renderId = 0
   const appRender = async () => {

@@ -1,7 +1,5 @@
 const removeDuplicates = array => {
-  return array.filter((item, pos) => {
-    return array.indexOf(item) === pos
-  })
+  return array.filter((item, index) =>  array.indexOf(item) === index)
 }
 
 const zip = (array1, array2) => {
@@ -16,22 +14,18 @@ const equals = (value1, value2) => {
   } else if (Array.isArray(value1)) {
     if (Array.isArray(value2)) {
       if (value1.length === value2.length) {
-        return zip(value1, value2).every(([item1, item2]) => {
-          return equals(item1, item2)
-        })
+        return zip(value1, value2).every(([item1, item2]) => equals(item1, item2))
       } else {
         return false
       }
     } else {
       return false
     }
-  } else if (value1 !== null && typeof value1 === 'object') {
-    if (value2 !== null && typeof value2  === 'object') {
+  } else if (typeof value1 === 'object') {
+    if (typeof value2  === 'object') {
       const keys1 = Object.keys(value1)
       const keys2 = Object.keys(value2)
-      return removeDuplicates([...keys1, ...keys2]).every(key => {
-        return equals(value1[key], value2[key])
-      })
+      return removeDuplicates([...keys1, ...keys2]).every(key => equals(value1[key], value2[key]))
     } else {
       return false
     }
@@ -40,7 +34,7 @@ const equals = (value1, value2) => {
   }
 }
 
-const renderText = (element, string) => {
+const updateText = (element, string) => {
   if (element.nodeValue !== string) {
     element.nodeValue = string
   }
@@ -154,7 +148,7 @@ const updateChildren = (element, virtualChildren, lastVirtualChildren) => {
 const updateElement = (element, virtualElement, lastVirtualElement) => {
   if (!equals(virtualElement, lastVirtualElement)) {
     if ((typeof virtualElement === 'string')) {
-      renderText(element, virtualElement)
+      updateText(element, virtualElement)
     } else {
       const virtualElementConfig = virtualElement.config
       const lastVirtualElementConfig = lastVirtualElement && lastVirtualElement.config

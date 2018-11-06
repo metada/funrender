@@ -2,14 +2,14 @@
   "name": "funrender",
   "version": "1.0.0",
   "description": "funrender",
-  "private": true,
+  "private": false,
   "scripts": {
     "dev": "node ./node_modules/webpack/bin/webpack.js --mode=development --config webpack.config.js",
     "build": "node ./node_modules/webpack/bin/webpack.js --mode=production --config webpack.config.js -p",
     "server": "webpack-dev-server --mode development --config webpack.config.js"
   },
   "author": "Jan Lastovicka, Metada s.r.o",
-  "license": "UNLICENSED",
+  "license": "Apache License 2.0",
   "dependencies": {},
   "devDependencies": {
     "webpack": "^4.16.2",
