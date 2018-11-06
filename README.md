@@ -138,3 +138,9 @@ The last example (http://localhost:8090/?fourth) shows how to use async function
   }
   appRender() 
 ```
+
+Note that virtual elements in the following expression are created asynchronously.
+
+```
+await (<Row><Counter/><IncreaseButton/></Row>)
+```
