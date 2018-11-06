@@ -96,7 +96,7 @@ It is the simple doto list application. In code you can see working with state.
 The last example (http://localhost:8090/?fourth) shows how to use async functions for virtual elements creation.
 
 ```
- const domElement = document.getElementById('content')
+  const domElement = document.getElementById('content')
   const sleep = time => {
     return new Promise(resolve => {
       setTimeout(() => {
