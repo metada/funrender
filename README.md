@@ -36,6 +36,14 @@ The following part of the code make virtual element representing column where in
 <Column><input onInput={handleChange}/><div>{value.toUpperCase()}</div></Column>
 ```
 
+Below you can see the definition of the `Column` function.
+
+```
+const Column = (props) => {
+  return <div style={{display: 'flex',  flexDirection: 'column'}}>{props.children}</div>
+}
+```
+
 We provide an aditional argument `lastVirtualElement` to the render function. It holds as the name suggest the last rendered virtual element. The render function compare the virtual element and the last rendered virtual element and make only necessary changes to dom. 
 
 We continue with the code of the third (http://localhost:8090/?third) example:
