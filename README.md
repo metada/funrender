@@ -89,7 +89,7 @@ We continue with the code of the third (http://localhost:8090/?third) example:
   appRender()
 ```
 
-It is the simple doto list application. In code you can see working with state.
+It is the simple doto list application. You can see working with a state in the code.
 
 The fourth example (http://localhost:8090/?fourth) shows how to use async functions for virtual elements creation.
 
