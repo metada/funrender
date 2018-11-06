@@ -1,11 +1,18 @@
 import {render} from './funrender.js'
-import {element, row, column} from './element.js'
+import {createElement} from './element.js'
 
 const param = window.location.href.split('?')[1]
 
+const Column = (props) => {
+  return <div style={{display: 'flex',  flexDirection: 'column'}}>{props.children}</div>
+}
+
+const Row = (props) => {
+  return <div style={{display: 'flex'}}>{props.children}</div>
+}
 
 const firstExample = () => {
-  render(document.getElementById('content'), element('div', {}, 'Hello world'))
+  render(document.getElementById('content'), <div>Hello world</div>)
 }
 
 const secondExample = () => {
@@ -19,14 +26,10 @@ const secondExample = () => {
   }
 
   const appRender = () => {  
-    const virtualElement = column([
-      element('input', {onInput: handleChange}),
-      value.toUpperCase()
-    ])
+    const virtualElement = <Column><input onInput={handleChange}/><div>{value.toUpperCase()}</div></Column>
     render(domElement, virtualElement, lastVirtualElement)
     lastVirtualElement = virtualElement
   }
-
   appRender()
 }
 
@@ -50,23 +53,20 @@ const thirdExample = () => {
     appRender()
   }
 
-  const viewTodosList = () => {
-    return element('ul', {}, state.todos.map(todo => element('li', {}, todo)))
+  const TodosList = () => {
+    return <ul>{state.todos.map(todo => <li>{todo}</li>)}</ul>
   }
   
-  const viewTodoInput = () => {
-    return element('input', {onInput: handleChange, value: state.inputValue})
+  const TodoInput = () => {
+    return <input onInput={handleChange} value={state.inputValue}/>
   }
   
-  const viewAddButton = () => {
-    return element('button', {onClick: handleAdd}, 'add')
+  const AddButton = () => {
+    return <button onClick={handleAdd}>add</button>
   }
   
   const appRender = () => { 
-    const virtualElement = column([
-      row([viewTodoInput(), viewAddButton()]),
-      viewTodosList()
-    ])
+    const virtualElement = <Column><Row><TodoInput/><AddButton/></Row><TodosList/></Column>
     render(domElement, virtualElement, lastVirtualElement)
     lastVirtualElement = virtualElement
   }
@@ -100,7 +100,7 @@ const fourthExample = () => {
   
   const storage = makeStorage()
   
-  const viewCounter = async () => {
+  const Counter = async () => {
     const data = await storage.getCounter()
     return String(data)
   }
@@ -110,8 +110,8 @@ const fourthExample = () => {
     appRender()
   }
 
-  const viewIncreaseButton = () => {
-    return element('button', {onClick: handleAdd}, 'increase')
+  const IncreaseButton = () => {
+    return <button onClick={handleAdd}>increase</button>
   }
   
   let lastVirtualElement
@@ -119,16 +119,12 @@ const fourthExample = () => {
   const appRender = async () => {
     renderId = renderId + 1 
     const id = renderId
-    const virtualElement = await row([
-      viewCounter(),
-      viewIncreaseButton()
-    ])
+    const virtualElement = await (<Row><Counter/><IncreaseButton/></Row>)
     if (id === renderId) {
       render(domElement, virtualElement, lastVirtualElement)
       lastVirtualElement = virtualElement
     }
   }
-
   appRender() 
 }
 
