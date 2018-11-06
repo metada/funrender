@@ -1,3 +1,6 @@
+import ReactDOM from "react-dom"
+import React from "react"
+
 const removeDuplicates = array => {
   return array.filter((item, index) =>  array.indexOf(item) === index)
 }
@@ -32,6 +35,10 @@ const equals = (value1, value2) => {
   } else {
     return false
   }
+}
+
+const isReactElement = element => {
+  return typeof element === 'object' && element['$$typeof'] === Symbol.for('react.element')
 }
 
 const updateText = (element, string) => {
@@ -101,6 +108,8 @@ const updateElementConfig = (element, config, lastConfig) => {
 const createElement = (virtualElement) => {
   if (typeof virtualElement === 'string') {
     return document.createTextNode(virtualElement)
+  } else if (isReactElement(virtualElement)) {
+    return document.createElement('div')
   } else {
     const type = virtualElement.type
     return document.createElement(type)
@@ -141,6 +150,10 @@ const updateChildren = (element, virtualChildren, lastVirtualChildren) => {
   const deleteCount = children.length - virtualChildren.length
   for (let i = 0; i < deleteCount; i += 1) {
     let child = children[children.length - 1]
+    let virtualChild = lastVirtualChildren[lastVirtualChildren - 1 - i]
+    if (isReactElement(virtualChild)) {
+      ReactDOM.render(React.createElement('div'), child)
+    }
     element.removeChild(child)
   }
 }
@@ -149,6 +162,8 @@ const updateElement = (element, virtualElement, lastVirtualElement) => {
   if (!equals(virtualElement, lastVirtualElement)) {
     if ((typeof virtualElement === 'string')) {
       updateText(element, virtualElement)
+    } else if (isReactElement(virtualElement)) {
+      ReactDOM.render(virtualElement, element)
     } else {
       const virtualElementConfig = virtualElement.config
       const lastVirtualElementConfig = lastVirtualElement && lastVirtualElement.config

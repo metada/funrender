@@ -1,5 +1,6 @@
 import {render} from './funrender.js'
 import {createElement} from './element.js'
+import React from 'react'
 
 const param = window.location.href.split('?')[1]
 
@@ -128,6 +129,10 @@ const fourthExample = () => {
   appRender() 
 }
 
+const fifthExample =  () => {
+  render(document.getElementById('content'), <div>{React.createElement('div', null, 'React div')}</div>)
+}
+
 if (param === 'first') {
   firstExample()
 } else if (param === 'second') {
@@ -136,6 +141,9 @@ if (param === 'first') {
   thirdExample()
 } else if (param === 'fourth') {
   fourthExample()
+} else if (param === 'fifth') {
+  fifthExample()
 }
+
 
 

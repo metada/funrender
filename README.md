@@ -83,7 +83,7 @@ We continue with the code of the third (http://localhost:8090/?third) example:
 
 It is the simple doto list application. In code you can see working with state.
 
-The last example (http://localhost:8090/?fourth) shows how to use async functions for virtual elements creation.
+The fourth example (http://localhost:8090/?fourth) shows how to use async functions for virtual elements creation.
 
 ```
   const domElement = document.getElementById('content')
@@ -139,8 +139,8 @@ The last example (http://localhost:8090/?fourth) shows how to use async function
   appRender() 
 ```
 
-Note that virtual elements in the following expression are created asynchronously.
+The last simple example (http://localhost:8090/?fifth)  shows how to use React elements in virtual elements:
 
 ```
-await (<Row><Counter/><IncreaseButton/></Row>)
+render(document.getElementById('content'), <div>{React.createElement('div', null, 'React div')}</div>)
 ```

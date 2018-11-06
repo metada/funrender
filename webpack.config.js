@@ -37,7 +37,20 @@ module.exports = {
             ]
           }
         }
-      }
+      },
+      /*{
+        test: /\.(jsx)$/,
+        exclude: /(node_modules|bower_components)/,
+        include: [
+          path.resolve(__dirname, "src/react"),
+        ],
+        use: {
+          loader: 'babel-loader',
+          options: {
+            presets:  ['@babel/react'],
+          }
+        }
+      }*/
     ]
   }
 }
