@@ -1,27 +1,39 @@
-export const element = (type, config, children) => {
+export const createElement = (type, config, ...children) => {
   if (typeof children === 'undefined') {
     children = []
   }
-  if (typeof config === 'undefined') {
+  if (children.length === 1 && Array.isArray(children[0])) {
+    children = children[0]
+  }
+  if (typeof config === 'undefined' || config === null) {
     config = {}
   }
+
+  if (typeof type === 'function') {
+    return type({...config, children: children})
+  }
+  
   if (typeof type !== 'string') {
     throw new Error('Type has to be a string.', type)
   }
+
   if (typeof config !== 'object') {
     throw new Error('Config has to be an object.', config)
   }
+
   if (children instanceof Promise) {
     return children.then(result => {
-      return element(type, config, result)
+      return createElement(type, config, result)
     })
   }
+
   if (!(children instanceof Array)) {
     children = [children]
   }
+  
   if (children.some(child => child instanceof Promise)) {
     return Promise.all(children).then(result => {
-      return element(type, config, result)
+      return createElement(type, config, result)
     })
   } else {
     const definedChildren = children.filter(child => typeof child !== 'undefined')
@@ -36,16 +48,4 @@ export const element = (type, config, children) => {
       children: definedChildren
     }
   }
-}
-
-export const styledElement = (type, config, style, children) => {
-  return element(type, {...config, style: style}, children)
-}
-
-export const row = children => {
-  return styledElement('div', {}, {display: 'flex'}, children)
-}
-
-export const column = children => {
-  return styledElement('div', {}, {display: 'flex', flexDirection: 'column'}, children)
 }

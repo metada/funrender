@@ -1,14 +1,14 @@
 # funrender
 
-We present a tiny library for rendering virtual elements in DOM. The library fits well with using functions in describing virtual elements. This justify the name of the library Funrender (fun stands from function). We provide four simple example of using the library. In order to run examples clone the repository, run `npm install` and `npm run server` in the repository directory. Then you can type http://localhost:8090/?first to your browser to see the first example. 
+We present a tiny library for rendering virtual elements in DOM. The library fits well with using functions in describing virtual elements. This justify the name of the library Funrender (fun stands from function). We provide four simple example of using the library. In order to run examples clone the repository, run `npm install` and `npm run start` in the repository directory. Then you can type http://localhost:8090/?first to your browser to see the first example. 
 
 The first example render 'Hello world' to your browser. The code of the exapmle is: 
 
 ```
-render(document.getElementById('content'), element('div', {}, 'Hello world'))
+render(document.getElementById('content'), <div>Hello world</div>)
 ```
 
-The function element creates a virtual element representing a div element with the only child to be a text node. The function render then updates the dom element with id content according to the virtual element.
+The expression `<div>Hello world</div>` creates a virtual element representing a div element with the only child to be a text node. The function render then updates the dom element with id content according to the virtual element.
 
 To run the second example type http://localhost:8090/?second. The second application displays the capitalization of the text you type in the input. The code of the second example is the following.
 
@@ -23,24 +23,17 @@ To run the second example type http://localhost:8090/?second. The second applica
   }
 
   const appRender = () => {  
-    const virtualElement = column([
-      element('input', {onInput: handleChange}),
-      value.toUpperCase()
-    ])
+    const virtualElement = <Column><input onInput={handleChange}/><div>{value.toUpperCase()}</div></Column>
     render(domElement, virtualElement, lastVirtualElement)
     lastVirtualElement = virtualElement
   }
-
   appRender()
 ```
 
 The following part of the code make virtual element representing column where in the first row is an input and in the second row capitalized value of the input.
 
 ```
-column([
-    element('input', {onInput: handleChange}),
-    value.toUpperCase()
-])
+<Column><input onInput={handleChange}/><div>{value.toUpperCase()}</div></Column>
 ```
 
 We provide an aditional argument `lastVirtualElement` to the render function. It holds as the name suggest the last rendered virtual element. The render function compare the virtual element and the last rendered virtual element and make only necessary changes to dom. 
@@ -67,23 +60,20 @@ We continue with the code of the third (http://localhost:8090/?third) example:
     appRender()
   }
 
-  const viewTodosList = () => {
-    return element('ul', {}, state.todos.map(todo => element('li', {}, todo)))
+  const TodosList = () => {
+    return <ul>{state.todos.map(todo => <li>{todo}</li>)}</ul>
   }
   
-  const viewTodoInput = () => {
-    return element('input', {onInput: handleChange, value: state.inputValue})
+  const TodoInput = () => {
+    return <input onInput={handleChange} value={state.inputValue}/>
   }
   
-  const viewAddButton = () => {
-    return element('button', {onClick: handleAdd}, 'add')
+  const AddButton = () => {
+    return <button onClick={handleAdd}>add</button>
   }
   
   const appRender = () => { 
-    const virtualElement = column([
-      row([viewTodoInput(), viewAddButton()]),
-      viewTodosList()
-    ])
+    const virtualElement = <Column><Row><TodoInput/><AddButton/></Row><TodosList/></Column>
     render(domElement, virtualElement, lastVirtualElement)
     lastVirtualElement = virtualElement
   }
@@ -121,7 +111,7 @@ The last example (http://localhost:8090/?fourth) shows how to use async function
   
   const storage = makeStorage()
   
-  const viewCounter = async () => {
+  const Counter = async () => {
     const data = await storage.getCounter()
     return String(data)
   }
@@ -131,8 +121,8 @@ The last example (http://localhost:8090/?fourth) shows how to use async function
     appRender()
   }
 
-  const viewIncreaseButton = () => {
-    return element('button', {onClick: handleAdd}, 'increase')
+  const IncreaseButton = () => {
+    return <button onClick={handleAdd}>increase</button>
   }
   
   let lastVirtualElement
@@ -140,15 +130,11 @@ The last example (http://localhost:8090/?fourth) shows how to use async function
   const appRender = async () => {
     renderId = renderId + 1 
     const id = renderId
-    const virtualElement = await row([
-      viewCounter(),
-      viewIncreaseButton()
-    ])
+    const virtualElement = await (<Row><Counter/><IncreaseButton/></Row>)
     if (id === renderId) {
       render(domElement, virtualElement, lastVirtualElement)
       lastVirtualElement = virtualElement
     }
   }
-
   appRender() 
 ```

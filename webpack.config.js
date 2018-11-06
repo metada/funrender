@@ -1,7 +1,7 @@
 const path = require('path')
 
 module.exports = {
-  entry: './src/index.js',
+  entry: './src/index.jsx',
   output: {
     path: __dirname,
     filename: 'app.js',
@@ -15,5 +15,29 @@ module.exports = {
       'Access-Control-Allow-Origin': '*',
       'Access-Control-Allow-Headers': '*'
     }
+  },
+  module: {
+    rules: [
+      {
+        test: /\.(jsx)$/,
+        exclude: /(node_modules|bower_components)/,
+        include: [
+          path.resolve(__dirname, "src"),
+        ],
+        use: {
+          loader: 'babel-loader',
+          options: {
+            presets:  [],
+            plugins: [
+              ["@babel/plugin-transform-react-jsx", {
+                "pragma": "createElement", // default pragma is React.createElement
+                "pragmaFrag": "elementFrag", // default is React.Fragment
+                "throwIfNamespace": false // defaults to true
+              }]
+            ]
+          }
+        }
+      }
+    ]
   }
-};
+}
