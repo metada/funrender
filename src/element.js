@@ -1,10 +1,15 @@
+const flattenDeep = (arr1) => {
+  return arr1.reduce((acc, val) => Array.isArray(val) ? acc.concat(flattenDeep(val)) : acc.concat(val), []);
+}
+
 export const createElement = (type, config, ...children) => {
   if (typeof children === 'undefined') {
     children = []
   }
-  if (children.length === 1 && Array.isArray(children[0])) {
-    children = children[0]
+  if (Array.isArray(children)) {
+    children = flattenDeep(children)
   }
+  
   if (typeof config === 'undefined' || config === null) {
     config = {}
   }
@@ -13,8 +18,8 @@ export const createElement = (type, config, ...children) => {
     return type({...config, children: children})
   }
   
-  if (typeof type !== 'string') {
-    throw new Error('Type has to be a string.', type)
+  if (typeof type !== 'string' && typeof type !== 'object') {
+    throw new Error('Type has to be a string or object.', type)
   }
 
   if (typeof config !== 'object') {
@@ -37,11 +42,11 @@ export const createElement = (type, config, ...children) => {
     })
   } else {
     const definedChildren = children.filter(child => typeof child !== 'undefined')
-    definedChildren.forEach(child => {
+    /*definedChildren.forEach(child => {
       if (child instanceof Array) {
         throw new Error('Child can not be an array.', child)
       }
-    })
+    })*/
     return {
       type: type,
       config: config,
@@ -49,3 +54,5 @@ export const createElement = (type, config, ...children) => {
     }
   }
 }
+
+export const Fragment = props => props.children

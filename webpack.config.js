@@ -31,7 +31,7 @@ module.exports = {
             plugins: [
               ["@babel/plugin-transform-react-jsx", {
                 "pragma": "createElement", // default pragma is React.createElement
-                "pragmaFrag": "elementFrag", // default is React.Fragment
+                "pragmaFrag": "Fragment", // default is React.Fragment
                 "throwIfNamespace": false // defaults to true
               }]
             ]

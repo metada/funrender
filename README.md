@@ -157,5 +157,15 @@ await (<Row><Counter/><IncreaseButton/></Row>)
 The last simple example (http://localhost:8090/?fifth)  shows how to use React elements in virtual elements:
 
 ```
-render(document.getElementById('content'), <div>{React.createElement('div', null, 'React div')}</div>)
+render(document.getElementById('content'), <div><ReactElement>{React.createElement('div', null, 'React div')}</ReactElement></div>)
+```
+
+We end with the definition of `ReactElement`. Similarly, any foreign library can be embedded in Funrender.
+
+```
+const ReactElement = {
+  create: () => document.createElement('div'),
+  unmount: (element) => ReactDOM.render(element, React.createElement('div')),
+  update: (element, props) => ReactDOM.render(props.children[0], element)
+}
 ```

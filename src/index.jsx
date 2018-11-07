@@ -1,8 +1,8 @@
 import {render} from './funrender.js'
 import {createElement} from './element.js'
+import {Fragment} from './element.js'
 import React from 'react'
-
-const param = window.location.href.split('?')[1]
+import ReactDOM from 'react-dom'
 
 const Column = (props) => {
   return <div style={{display: 'flex',  flexDirection: 'column'}}>{props.children}</div>
@@ -129,10 +129,18 @@ const fourthExample = () => {
   appRender() 
 }
 
-const fifthExample =  () => {
-  render(document.getElementById('content'), <div>{React.createElement('div', null, 'React div')}</div>)
+const ReactElement = {
+  create: () => document.createElement('div'),
+  unmount: (element) => ReactDOM.render(element, React.createElement('div')),
+  update: (element, props) => ReactDOM.render(props.children[0], element)
 }
 
+const fifthExample =  () => {
+  render(document.getElementById('content'), <div><ReactElement>{React.createElement('div', null, 'React div')}</ReactElement></div>)
+}
+
+
+const param = window.location.href.split('?')[1]
 if (param === 'first') {
   firstExample()
 } else if (param === 'second') {
