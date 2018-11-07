@@ -2,7 +2,7 @@
 
 We present a tiny library for rendering virtual elements in DOM. The library fits well with using functions in describing virtual elements. This justify the name of the library Funrender (fun stands from function). The main difference with React library is that in Funrender all virtual elements are first created and then rendered. For creation of virtual elements only functions (sync or async) can be used. We provide five simple examples of using the library. In order to run examples clone the repository, run `npm install` and `npm run start` in the repository directory. Then you can type http://localhost:8090/?first to your browser to see the first example. 
 
-The first example render 'Hello world' to your browser. The code of the exapmle is: 
+The first example render 'Hello world' to your browser. The code of the example is: 
 
 ```
 render(document.getElementById('content'), <div>Hello world</div>)
