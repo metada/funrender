@@ -1,38 +1,4 @@
-const removeDuplicates = array => {
-  return array.filter((item, index) =>  array.indexOf(item) === index)
-}
-
-const zip = (array1, array2) => {
-  return array1.map((item, index) => {
-    return [item, array2[index]]
-  })
-}
-
-const equals = (value1, value2) => {
-  if (value1 === value2) {
-    return true
-  } else if (Array.isArray(value1)) {
-    if (Array.isArray(value2)) {
-      if (value1.length === value2.length) {
-        return zip(value1, value2).every(([item1, item2]) => equals(item1, item2))
-      } else {
-        return false
-      }
-    } else {
-      return false
-    }
-  } else if (typeof value1 === 'object') {
-    if (typeof value2  === 'object') {
-      const keys1 = Object.keys(value1)
-      const keys2 = Object.keys(value2)
-      return removeDuplicates([...keys1, ...keys2]).every(key => equals(value1[key], value2[key]))
-    } else {
-      return false
-    }
-  } else {
-    return false
-  }
-}
+import {equals} from './library.js'
 
 const updateText = (element, string) => {
   if (element.nodeValue !== string) {
@@ -53,14 +19,9 @@ const updateElementStyle = (element, style, lastStyle) => {
   }
 }
 
-const events = {
-  onMouseEnter: 'mouseenter',
-  onMouseLeave: 'mouseleave',
-  onClick: 'click',
-  onInput: 'input',
-  onMouseMove: 'mousemove'
-}
+const isEventHandler = name => name[0]=='o' && name[1]=='n'
 
+const handlerEventName = name => name.toLowerCase().substring(2)
 
 const updateElementConfig = (element, config, lastConfig) => {
   Object.keys(config).forEach(key => {
@@ -74,11 +35,12 @@ const updateElementConfig = (element, config, lastConfig) => {
           updateElementStyle(element, value, lastStyle)
           break
         default:
-          if (events[key]) {
+          if (isEventHandler(key)) {
+            const eventName = handlerEventName(key)
             if (lastConfig && lastConfig[key]) {
-              element.removeEventListener(events[key], lastConfig[key])
+              element.removeEventListener(eventName, lastConfig[key])
             }
-            element.addEventListener(events[key], value)
+            element.addEventListener(eventName, value)
           } else {
             element[key] = value
           }
@@ -144,7 +106,7 @@ const updateChildren = (element, virtualChildren, lastVirtualChildren) => {
   for (let i = 0; i < deleteCount; i += 1) {
     let child = children[children.length - 1]
     let virtualChild = lastVirtualChildren[lastVirtualChildren - 1 - i]
-    if (typeof virtaulChild === 'object' && typeof virtaulChild.type === 'object') {
+    if (typeof virtualChild === 'object' && typeof virtaulChild.type === 'object') {
       virtaulChild.type.unmount(child)
     }
     element.removeChild(child)
