@@ -1,4 +1,4 @@
-import {equals, ensureArray, flattenDeep} from './library.js'
+import {equals, ensureArray, flatten} from './library.js'
 
 const updateText = (element, string) => {
   if (element.nodeValue !== string) {
@@ -138,7 +138,7 @@ export const render = (element, virtualElement, lastVirtualElement) => {
 
 // creation of virtual elements
 export const createElement = (type, config, ...children) => {
-  children = flattenDeep(children)
+  children = flatten(children)
 
   if (typeof config === 'undefined' || config === null) {
     config = {}
