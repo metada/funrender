@@ -1,4 +1,4 @@
-import {render, createElement, Fragment} from './funrender.js'
+import {render, createElement, Fragment, createRender, createState} from './funrender.js'
 import React from 'react'
 import ReactDOM from 'react-dom'
 
@@ -15,66 +15,62 @@ const firstExample = () => {
 }
 
 const secondExample = () => {
-  const domElement = document.getElementById('content')
-  let value = ""
-  let lastVirtualElement
+  const appRender = createRender(document.getElementById('content'), () => {
+    return (
+      <Column>
+        <input onInput={handleChange}/>
+        <div>{getValue().toUpperCase()}</div>
+      </Column>
+    )
+  })
+  
+  const [getValue, setValue] = createState('', appRender)
 
   const handleChange = event => {
-    value = event.target.value
-    appRender()
+    setValue(event.target.value)
   }
 
-  const appRender = () => {  
-    const virtualElement = <Column><input onInput={handleChange}/><div>{value.toUpperCase()}</div></Column>
-    render(domElement, virtualElement, lastVirtualElement)
-    lastVirtualElement = virtualElement
-  }
   appRender()
 }
 
 const thirdExample = () => {
-  const domElement = document.getElementById('content')
-  let state = {
-    todos: [],
-    inputValue: ''
-  }
-  
-  let lastVirtualElement
+  const appRender = createRender(document.getElementById('content'), () => {
+    return (
+      <Column>
+        <Row><TodoInput/><AddButton/></Row>
+        <TodosList/>
+      </Column>
+    )
+  })
+
+  const [getTodos, setTodos] = createState([], appRender)
+  const [getInputValue, setInputValue] = createState('', appRender)
   
   const handleChange = event => {
-    state.inputValue = event.target.value
-    appRender()
+    setInputValue(event.target.value)
   }
 
   const handleAdd = () => {
-    state.todos.push(state.inputValue)
-    state.inputValue = ''
-    appRender()
+    setTodos(getTodos().concat(getInputValue()))
+    setInputValue('')
   }
 
   const TodosList = () => {
-    return <ul>{state.todos.map(todo => <li>{todo}</li>)}</ul>
+    return <ul>{getTodos().map(todo => <li>{todo}</li>)}</ul>
   }
   
   const TodoInput = () => {
-    return <input onInput={handleChange} value={state.inputValue}/>
+    return <input onInput={handleChange} value={getInputValue()}/>
   }
   
   const AddButton = () => {
     return <button onClick={handleAdd}>add</button>
   }
-  
-  const appRender = () => { 
-    const virtualElement = <Column><Row><TodoInput/><AddButton/></Row><TodosList/></Column>
-    render(domElement, virtualElement, lastVirtualElement)
-    lastVirtualElement = virtualElement
-  }
-  
+
   appRender()
 }
 
 const fourthExample = () => {
-  const domElement = document.getElementById('content')
   const sleep = time => {
     return new Promise(resolve => {
       setTimeout(() => {
@@ -83,7 +79,7 @@ const fourthExample = () => {
     })
   }
 
-  const makeStorage = () => {
+  const makeStorage = (renderFunction) => {
     let counter = 1
     return {
       getCounter: async () => {
@@ -92,12 +88,17 @@ const fourthExample = () => {
       },
       increaseCounter: async () => {
         await sleep(1000 * Math.random())
-        counter = counter + 1 
+        counter = counter + 1
+        renderFunction()
       } 
     }
   }
   
-  const storage = makeStorage()
+  const appRender =  createRender(document.getElementById('content'), () => {
+    return <Row><Counter/><IncreaseButton/></Row>
+  })
+
+  const storage = makeStorage(appRender)
   
   const Counter = async () => {
     const data = await storage.getCounter()
@@ -106,24 +107,12 @@ const fourthExample = () => {
 
   const handleAdd = async () => {
     await storage.increaseCounter()
-    appRender()
   }
 
   const IncreaseButton = () => {
     return <button onClick={handleAdd}>increase</button>
   }
-  
-  let lastVirtualElement
-  let renderId = 0
-  const appRender = async () => {
-    renderId = renderId + 1 
-    const id = renderId
-    const virtualElement = await (<Row><Counter/><IncreaseButton/></Row>)
-    if (id === renderId) {
-      render(domElement, virtualElement, lastVirtualElement)
-      lastVirtualElement = virtualElement
-    }
-  }
+
   appRender() 
 }
 

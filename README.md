@@ -1,6 +1,6 @@
-# funrender
+# Funrender
 
-We present a tiny library for rendering virtual elements in DOM. The library fits well with using functions in describing virtual elements. This justify the name of the library Funrender (fun stands from function). The main difference with React library is that in Funrender all virtual elements are first created and then rendered. For creation of virtual elements only functions (sync or async) can be used. We provide five simple examples of using the library. In order to run examples clone the repository, run `npm install` and `npm run start` in the repository directory. Then you can type http://localhost:8090/?first to your browser to see the first example. 
+We present a tiny library for rendering virtual elements to DOM. The library fits well with using functions in describing virtual elements. This justify the name of the library Funrender (fun stands from function). The main difference with React library is that in Funrender all virtual elements are first created and then rendered. For creation of virtual elements only functions (sync or async) can be used. We provide five simple examples of using the library. In order to run examples clone the repository, run `npm install` and `npm run start` in the repository directory. Then you can type http://localhost:8090/?first to your browser to see the first example. 
 
 
 The first example render 'Hello world' to your browser. The code of the example is: 
@@ -14,30 +14,34 @@ The expression `<div>Hello world</div>` creates a virtual element representing a
 To run the second example type http://localhost:8090/?second. The second application displays the capitalization of the text you type in the input. The code of the second example is the following.
 
 ```
-  const domElement = document.getElementById('content')
-  let value = ""
-  let lastVirtualElement
+  const appRender = createRender(document.getElementById('content'), () => {
+    return (
+      <Column>
+        <input onInput={handleChange}/>
+        <div>{getValue().toUpperCase()}</div>
+      </Column>
+    )
+  })
+  
+  const [getValue, setValue] = createState('', appRender)
 
   const handleChange = event => {
-    value = event.target.value
-    appRender()
+    setValue(event.target.value)
   }
 
-  const appRender = () => {  
-    const virtualElement = <Column><input onInput={handleChange}/><div>{value.toUpperCase()}</div></Column>
-    render(domElement, virtualElement, lastVirtualElement)
-    lastVirtualElement = virtualElement
-  }
   appRender()
 ```
 
-The following part of the code make virtual element representing column where in the first row is an input and in the second row capitalized value of the input.
+The following part of the code makes virtual element representing a column where in the first row is an input and in the second row capitalized value of the input.
 
 ```
-<Column><input onInput={handleChange}/><div>{value.toUpperCase()}</div></Column>
+<Column>
+  <input onInput={handleChange}/>
+  <div>{getValue().toUpperCase()}</div>
+</Column>
 ```
 
-Below you can see the definition of the `Column` function.
+Below you can see the definition of the `Column` component (function).
 
 ```
 const Column = (props) => {
@@ -45,58 +49,51 @@ const Column = (props) => {
 }
 ```
 
-We provide an additional argument `lastVirtualElement` to the render function. It holds as the name suggest the last rendered virtual element. The render function compare the virtual element and the last rendered virtual element and make only necessary changes to dom. 
-
 We continue with the code of the third (http://localhost:8090/?third) example:
 
 ```
-  const domElement = document.getElementById('content')
-  let state = {
-    todos: [],
-    inputValue: ''
-  }
+  const appRender = createRender(document.getElementById('content'), () => {
+    return (
+      <Column>
+        <Row><TodoInput/><AddButton/></Row>
+        <TodosList/>
+      </Column>
+    )
+  })
   
-  let lastVirtualElement
+  const [getTodos, setTodos] = createState([], appRender)
+  const [getInputValue, setInputValue] = createState('', appRender)
   
   const handleChange = event => {
-    state.inputValue = event.target.value
-    appRender()
+    setInputValue(event.target.value)
   }
 
   const handleAdd = () => {
-    state.todos.push(state.inputValue)
-    state.inputValue = ''
-    appRender()
+    setTodos(getTodos().concat(getInputValue()))
+    setInputValue('')
   }
 
   const TodosList = () => {
-    return <ul>{state.todos.map(todo => <li>{todo}</li>)}</ul>
+    return <ul>{getTodos().map(todo => <li>{todo}</li>)}</ul>
   }
   
   const TodoInput = () => {
-    return <input onInput={handleChange} value={state.inputValue}/>
+    return <input onInput={handleChange} value={getInputValue()}/>
   }
   
   const AddButton = () => {
     return <button onClick={handleAdd}>add</button>
   }
-  
-  const appRender = () => { 
-    const virtualElement = <Column><Row><TodoInput/><AddButton/></Row><TodosList/></Column>
-    render(domElement, virtualElement, lastVirtualElement)
-    lastVirtualElement = virtualElement
-  }
-  
+
   appRender()
 ```
 
-It is the simple doto list application. You can see working with a state in the code.
+It is the simple todo list application. You can see working with a state in the code.
 
 The fourth example (http://localhost:8090/?fourth) shows how to use async functions for virtual elements creation.
 
 ```
-  const domElement = document.getElementById('content')
-  const sleep = time => {
+   const sleep = time => {
     return new Promise(resolve => {
       setTimeout(() => {
         resolve()
@@ -104,7 +101,7 @@ The fourth example (http://localhost:8090/?fourth) shows how to use async functi
     })
   }
 
-  const makeStorage = () => {
+  const makeStorage = (renderFunction) => {
     let counter = 1
     return {
       getCounter: async () => {
@@ -113,12 +110,17 @@ The fourth example (http://localhost:8090/?fourth) shows how to use async functi
       },
       increaseCounter: async () => {
         await sleep(1000 * Math.random())
-        counter = counter + 1 
+        counter = counter + 1
+        renderFunction()
       } 
     }
   }
   
-  const storage = makeStorage()
+  const appRender =  createRender(document.getElementById('content'), () => {
+    return <Row><Counter/><IncreaseButton/></Row>
+  })
+
+  const storage = makeStorage(appRender)
   
   const Counter = async () => {
     const data = await storage.getCounter()
@@ -127,24 +129,12 @@ The fourth example (http://localhost:8090/?fourth) shows how to use async functi
 
   const handleAdd = async () => {
     await storage.increaseCounter()
-    appRender()
   }
 
   const IncreaseButton = () => {
     return <button onClick={handleAdd}>increase</button>
   }
-  
-  let lastVirtualElement
-  let renderId = 0
-  const appRender = async () => {
-    renderId = renderId + 1 
-    const id = renderId
-    const virtualElement = await (<Row><Counter/><IncreaseButton/></Row>)
-    if (id === renderId) {
-      render(domElement, virtualElement, lastVirtualElement)
-      lastVirtualElement = virtualElement
-    }
-  }
+
   appRender() 
 ```
 
@@ -152,7 +142,7 @@ The fourth example (http://localhost:8090/?fourth) shows how to use async functi
 Note that virtual elements in the following expression are created asynchronously.
 
 ```
-await (<Row><Counter/><IncreaseButton/></Row>)
+<Row><Counter/><IncreaseButton/></Row>
 ```
 
 The last simple example (http://localhost:8090/?fifth)  shows how to use React elements in virtual elements:

@@ -171,3 +171,38 @@ export const createElement = (type, config, ...children) => {
 }
 
 export const Fragment = props => props.children
+
+
+// helping functions 
+export const createRender = (element, component) => {
+  let lastVirtualElement
+  let renderId = 0
+  return () => {
+    const result = component()
+    if (result instanceof Promise) {
+      renderId = (renderId + 1) % Number.MAX_SAFE_INTEGER
+      const id = renderId
+      return result.then(virtualElement => {
+        if (id === renderId) {
+          render(element, virtualElement, lastVirtualElement)
+          lastVirtualElement = virtualElement
+        }
+      })
+    } else {
+      const virtualElement = result
+      render(element, virtualElement, lastVirtualElement)
+      lastVirtualElement = virtualElement
+    }
+  }
+}
+
+export const createState = (initialState, renderFunction) => {
+  let state = initialState
+  return [
+    () => state, 
+    (newState) => {
+      state = newState
+      renderFunction()
+    }
+  ]
+}
