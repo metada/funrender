@@ -1,6 +1,4 @@
-import {render} from './funrender.js'
-import {createElement} from './element.js'
-import {Fragment} from './element.js'
+import {render, createElement, Fragment} from './funrender.js'
 import React from 'react'
 import ReactDOM from 'react-dom'
 

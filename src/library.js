@@ -33,3 +33,17 @@ export const equals = (value1, value2) => {
     return false
   }
 }
+
+export const ensureArray = value => {
+  if (typeof value === 'undefined') {
+    return []
+  } else if (value instanceof Array) {
+    return value
+  } else {
+    return [value]
+  }
+}
+
+export const flattenDeep = (arr1) => {
+  return arr1.reduce((acc, val) => Array.isArray(val) ? acc.concat(flattenDeep(val)) : acc.concat(val), []);
+}

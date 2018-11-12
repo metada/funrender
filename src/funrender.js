@@ -1,4 +1,4 @@
-import {equals} from './library.js'
+import {equals, ensureArray, flattenDeep} from './library.js'
 
 const updateText = (element, string) => {
   if (element.nodeValue !== string) {
@@ -60,7 +60,7 @@ const updateElementConfig = (element, config, lastConfig) => {
   }
 }
 
-const createElement = (virtualElement) => {
+const createDomElement = (virtualElement) => {
   if (typeof virtualElement === 'string') {
     return document.createTextNode(virtualElement)
   } else if (typeof virtualElement.type === 'object') {
@@ -79,14 +79,14 @@ const updateExistingElement = (element, child, virtualChild, lastVirtualChild) =
   if (isCorrectType(virtualChild, lastVirtualChild)) {
     updateElement(child, virtualChild, lastVirtualChild)
   } else {
-    const newChild = createElement(virtualChild)
+    const newChild = createDomElement(virtualChild)
     updateElement(newChild, virtualChild, lastVirtualChild)
     element.replaceChild(newChild, child)
   }
 }
 
 const createChild = (element, virtualChild) => {
-  const child = createElement(virtualChild)
+  const child = createDomElement(virtualChild)
   updateElement(child, virtualChild, undefined)
   element.appendChild(child)
 }
@@ -132,5 +132,42 @@ const updateElement = (element, virtualElement, lastVirtualElement) => {
 }
 
 export const render = (element, virtualElement, lastVirtualElement) => {
-  updateElement(element, virtualElement, lastVirtualElement)
+  updateChildren(element, ensureArray(virtualElement), ensureArray(lastVirtualElement))
 }
+
+
+// creation of virtual elements
+export const createElement = (type, config, ...children) => {
+  children = flattenDeep(children)
+
+  if (typeof config === 'undefined' || config === null) {
+    config = {}
+  }
+
+  if (typeof type === 'function') {
+    return type({...config, children: children})
+  }
+  
+  if (typeof type !== 'string' && typeof type !== 'object') {
+    throw new Error('Type has to be a string, function or object.', type)
+  }
+
+  if (typeof config !== 'object') {
+    throw new Error('Config has to be an object.', config)
+  }
+  
+  if (children.some(child => child instanceof Promise)) {
+    return Promise.all(children).then(result => {
+      return createElement(type, config, ...result)
+    })
+  } else {
+    const definedChildren = children.filter(child => typeof child !== 'undefined')
+    return {
+      type: type,
+      config: config,
+      children: definedChildren
+    }
+  }
+}
+
+export const Fragment = props => props.children
