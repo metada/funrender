@@ -50,8 +50,8 @@ const updateElementConfig = (element, config, lastConfig) => {
   if (lastConfig) {
     Object.keys(lastConfig).forEach(key => {
       if (typeof config[key] === 'undefined') {
-        if (events[key]) {
-          element.removeEventListener(events[key], lastConfig[key])
+        if (isEventHandler(key)) {
+          element.removeEventListener( handlerEventName(key), lastConfig[key])
         } else {
           element.removeAttribute(key)
         }
